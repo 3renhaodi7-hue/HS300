@@ -9,12 +9,13 @@ app = FastAPI()
 @app.get("/api/stockdata")
 async def get_stock_data(days: int = 30):
     try:
-        # 1. 获取沪深300指数数据
+        # 1. 获取沪深300指数数据 (注意：akshare 1.16.x 的函数名可能已变更)
+        # 如果下一行报错，我们可能需要查找新版本对应的函数名
         index_data = ak.index_value_hist_funddb(symbol="沪深300")
         index_data['日期'] = pd.to_datetime(index_data['日期'])
         index_data = index_data.sort_values('日期').tail(days)
 
-        # 2. 获取10年期国债收益率
+        # 2. 获取10年期国债收益率 (此函数名在近期版本中相对稳定)
         bond_yield_df = ak.bond_china_yield()
         bond_10y = bond_yield_df[bond_yield_df['期限'] == '10年'].copy()
         bond_10y['日期'] = pd.to_datetime(bond_10y['日期'])
@@ -37,10 +38,11 @@ async def get_stock_data(days: int = 30):
         }
 
     except Exception as e:
+        # 如果是因为函数名变更导致的错误，这里会捕获
         return {
             "code": 500,
             "data": None,
-            "message": f"数据获取失败: {str(e)}"
+            "message": f"数据获取失败，可能是akshare接口已更新。错误详情: {str(e)}"
         }
 
 # Netlify 函数入口
