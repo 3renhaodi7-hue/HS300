@@ -1,11 +1,18 @@
 [build]
   publish = "."
 
+# 明确指定使用 Python 运行时
+[build.environment]
+  PYTHON_VERSION = "3.9"
+
+# 关键：将 /api/* 的请求路由到 functions 目录下的对应文件
 [[redirects]]
   from = "/api/*"
   to = "/.netlify/functions/:splat"
   status = 200
 
+# 指定函数目录和运行时
 [functions]
   directory = "api"
-  node_bundler = "esbuild"
+  # 对于 Python，node_bundler 的设置不是必须的，可以移除或注释掉
+  # node_bundler = "esbuild"
